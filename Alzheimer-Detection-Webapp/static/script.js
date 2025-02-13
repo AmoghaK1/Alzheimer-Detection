@@ -11,7 +11,7 @@ function uploadImage() {
     let imgURL = URL.createObjectURL(file);
     
     let imgbox = document.getElementById('imgbox');
-    imgbox.innerHTML = <img src="${imgURL}" style="max-width: 100%; height: auto;" />;
+    imgbox.innerHTML = `<img src="${imgURL}" style="max-width: 100%; height: auto;" />;`
 
     // Prepare FormData
     let formData = new FormData();
