@@ -7,9 +7,17 @@ function uploadImage() {
         return;
     }
 
+    // Generate a temporary URL for the image
+    let imgURL = URL.createObjectURL(file);
+    
+    let imgbox = document.getElementById('imgbox');
+    imgbox.innerHTML = <img src="${imgURL}" style="max-width: 100%; height: auto;" />;
+
+    // Prepare FormData
     let formData = new FormData();
     formData.append("file", file);
 
+    // Send the image to the server
     fetch("/predict", {
         method: "POST",
         body: formData
