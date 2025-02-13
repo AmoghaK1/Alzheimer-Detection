@@ -252,3 +252,136 @@ function handleDrop(e) {
         reader.readAsDataURL(files[0]);
     }
 }
+
+function downloadPatientPDF(patientId) {
+    const patient = patients.find(p => p.id === patientId);
+    if (!patient) return;
+
+    // Create new jsPDF instance
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Set initial position
+    let yPos = 20;
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Patient Medical Report', 105, yPos, { align: 'center' });
+    
+    // Add content with regular font size
+    doc.setFontSize(12);
+    
+    // Personal Information
+    yPos += 20;
+    doc.setFont(undefined, 'bold');
+    doc.text('Personal Information', 20, yPos);
+    doc.setFont(undefined, 'normal');
+    yPos += 10;
+    doc.text(`Name: ${patient.name}`, 20, yPos);
+    yPos += 10;
+    doc.text(`Age: ${patient.age}`, 20, yPos);
+    yPos += 10;
+    doc.text(`Date Added: ${patient.date}`, 20, yPos);
+    
+    // Medical History
+    yPos += 20;
+    doc.setFont(undefined, 'bold');
+    doc.text('Medical History', 20, yPos);
+    doc.setFont(undefined, 'normal');
+    yPos += 10;
+    
+    // Handle long text wrapping for medical history
+    const splitHistory = doc.splitTextToSize(patient.history, 170);
+    doc.text(splitHistory, 20, yPos);
+    yPos += splitHistory.length * 7;
+    
+    // Analysis Result
+    yPos += 20;
+    doc.setFont(undefined, 'bold');
+    doc.text('Analysis Result', 20, yPos);
+    doc.setFont(undefined, 'normal');
+    yPos += 10;
+    doc.text(patient.prediction, 20, yPos);
+    
+    // Add MRI Image
+    yPos += 20;
+    const maxWidth = 170;
+const maxHeight = 100;
+
+// Get original image dimensions
+const imgWidth = patient.mriScan.width;
+const imgHeight = patient.mriScan.height;
+
+// Calculate aspect ratio
+const aspectRatio = imgWidth / imgHeight;
+
+// Calculate new dimensions
+let newWidth = maxWidth;
+let newHeight = maxWidth / aspectRatio;
+
+// If height is too large, scale based on height instead
+if (newHeight > maxHeight) {
+    newHeight = maxHeight;
+    newWidth = maxHeight * aspectRatio;
+}
+
+// Add image with calculated dimensions
+doc.addImage(patient.mriScan, 'JPEG', 20, yPos, newWidth, newHeight);
+    
+    // Generate PDF
+    doc.save(`patient_report_${patient.name.replace(/\s+/g, '_')}.pdf`);
+}
+
+// Modify the viewPatientDetails function to include the download button
+function viewPatientDetails(patientId) {
+    const patient = patients.find(p => p.id === patientId);
+    if (patient) {
+        const detailsHtml = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-start mb-4">
+                        <h2 class="text-2xl font-bold">Patient Details</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="downloadPatientPDF(${patient.id})" class="flex items-center space-x-2 text-blue-600 hover:text-blue-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Download PDF</span>
+                            </button>
+                            <button onclick="closePatientDetails()" class="text-gray-500 hover:text-gray-700">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-semibold">Personal Information</h3>
+                            <p>Name: ${patient.name}</p>
+                            <p>Age: ${patient.age}</p>
+                            <p>Date Added: ${patient.date}</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">Medical History</h3>
+                            <p>${patient.history}</p>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">MRI Scan</h3>
+                            <img src="${patient.mriScan}" alt="MRI Scan" class="w-full max-h-64 object-contain rounded-lg">
+                        </div>
+                        <div>
+                            <h3 class="font-semibold">Analysis Result</h3>
+                            <p>${patient.prediction}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const detailsElement = document.createElement('div');
+        detailsElement.id = 'patient-details-modal';
+        detailsElement.innerHTML = detailsHtml;
+        document.body.appendChild(detailsElement);
+    }
+}
