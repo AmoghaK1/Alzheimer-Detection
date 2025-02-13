@@ -11,7 +11,7 @@ model = tf.keras.models.load_model("optimized_model.h5")
 
 # Class labels
 label_mapping = {0: "Mild Demented", 1: "Moderate Demented", 2: "Non Demented", 3: "Very Mild Demented"}
-
+#hello
 # Ensure upload directory exists
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
