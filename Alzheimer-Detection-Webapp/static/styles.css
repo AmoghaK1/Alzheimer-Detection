@@ -1,31 +1,105 @@
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 50px;
-    background-color: #f4f4f4;
+/* Base Styles */
+.gradient-border {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+              linear-gradient(45deg, #3B82F6, #14B8A6) border-box;
+    border-radius: 1rem;
 }
 
-.container {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    display: inline-block;
+.upload-zone {
+    background: linear-gradient(135deg, #EFF6FF 0%, #F0FDFA 100%);
 }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin-top: 10px;
-    cursor: pointer;
+/* Button Styles */
+.primary-btn {
+    background: linear-gradient(45deg, #2563EB, #0D9488);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease-out;
 }
 
-button:hover {
-    background-color: #45a049;
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-input {
-    margin-bottom: 10px;
+.delete-btn {
+    background: linear-gradient(45deg, #EF4444, #DC2626);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* Navbar Styles */
+.navbar {
+    background: linear-gradient(to right, #1E40AF, #0F766E);
+    animation: slideDown 0.5s ease-out;
+}
+
+/* Form Styles */
+.patient-form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.form-input {
+    transition: all 0.3s ease;
+    border: 2px solid #E5E7EB;
+}
+
+.form-input:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Patient History Styles */
+.patient-card {
+    transition: all 0.3s ease;
+    animation: slideIn 0.5s ease-out;
+}
+
+.patient-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Prediction Styles */
+.prediction-card {
+    animation: slideIn 0.5s ease-out;
+}
+
+.loading-spinner {
+    border-top-color: #3B82F6;
+    animation: spin 1s linear infinite;
+}
+
+/* Animations */
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
