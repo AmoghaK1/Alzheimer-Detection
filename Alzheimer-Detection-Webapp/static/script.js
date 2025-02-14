@@ -304,34 +304,52 @@ function downloadPatientPDF(patientId) {
     doc.text(patient.prediction, 20, yPos);
     
     // Add MRI Image
-    yPos += 20;
-    const maxWidth = 170;
-const maxHeight = 100;
-
-// Get original image dimensions
-const imgWidth = patient.mriScan.width;
-const imgHeight = patient.mriScan.height;
-
-// Calculate aspect ratio
-const aspectRatio = imgWidth / imgHeight;
-
-// Calculate new dimensions
-let newWidth = maxWidth;
-let newHeight = maxWidth / aspectRatio;
-
-// If height is too large, scale based on height instead
-if (newHeight > maxHeight) {
-    newHeight = maxHeight;
-    newWidth = maxHeight * aspectRatio;
-}
-
-// Add image with calculated dimensions
-doc.addImage(patient.mriScan, 'JPEG', 20, yPos, newWidth, newHeight);
+    if (patient.mriScan && patient.mriScan !== 'default-image.jpg') {
+        yPos += 20;
+        
+        // Create temporary image to get dimensions
+        const img = new Image();
+        img.src = patient.mriScan;
+        
+        // Handle the image loading asynchronously
+        img.onload = function() {
+            // Define maximum dimensions for the PDF
+            const maxWidth = 170;
+            const maxHeight = 100;
+            
+            // Calculate aspect ratio
+            const aspectRatio = img.width / img.height;
+            
+            // Calculate dimensions to maintain aspect ratio
+            let imgWidth = maxWidth;
+            let imgHeight = imgWidth / aspectRatio;
+            
+            // If calculated height exceeds maxHeight, scale based on height
+            if (imgHeight > maxHeight) {
+                imgHeight = maxHeight;
+                imgWidth = imgHeight * aspectRatio;
+            }
+            
+            // Add image with calculated dimensions
+            doc.addImage(patient.mriScan, 'JPEG', 20, yPos, imgWidth, imgHeight);
+            
+            // Generate PDF
+            doc.save(`patient_report_${patient.name.replace(/\s+/g, '_')}.pdf`);
+        };
+        
+        // In case the image fails to load, still generate the PDF
+        img.onerror = function() {
+            doc.text('MRI image could not be loaded', 20, yPos);
+            doc.save(`patient_report_${patient.name.replace(/\s+/g, '_')}.pdf`);
+        };
+        
+        // Return early - the PDF will be generated in the onload callback
+        return;
+    }
     
-    // Generate PDF
+    // If there's no image, generate PDF immediately
     doc.save(`patient_report_${patient.name.replace(/\s+/g, '_')}.pdf`);
 }
-
 // Modify the viewPatientDetails function to include the download button
 function viewPatientDetails(patientId) {
     const patient = patients.find(p => p.id === patientId);
